@@ -1,0 +1,4 @@
+#teste
+echo "Executando framework distribuido"
+
+/opt/openmpi/bin/mpirun --mca btl_openib_cuda_rdma_limit 131072 --map-by slot -hostfile comm/hosts.cfg ./comm/framework

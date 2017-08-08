@@ -1,0 +1,79 @@
+#include <stdlib.h>
+#include <stdio.h>
+
+
+
+
+extern "C" {
+
+	void init(int **d_buff, int **d_rank,int *rank,int size){
+		
+		cudaMalloc((void**)d_buff,sizeof(int)*size);
+		cudaMalloc((void**)d_rank,sizeof(int));
+		cudaMemcpy(*d_rank, rank,sizeof(int),cudaMemcpyHostToDevice);
+
+	}
+
+	void MPI_standard(int *h_buff,int *d_buff,int rank, int size){
+
+		if(rank==0){
+			cudaMemcpy(h_buff, d_buff,sizeof(int)*size,cudaMemcpyDeviceToHost);	
+		}else{
+		}
+
+	}
+
+	void transfer_intra_P2P(int n_buffer){
+
+		int gpu1 = 0;
+		int gpu2 = 1;
+		int *d_buffer;
+		int *d2_buffer;
+
+
+		cudaSetDevice(gpu1);
+		cudaStream_t stream_0;
+		cudaMalloc(&d_buffer,sizeof(int)*n_buffer);
+
+		cudaSetDevice(gpu2);
+
+		cudaMalloc(&d2_buffer,sizeof(int)*n_buffer);
+
+		cudaMemcpyPeerAsync(d2_buffer,gpu2,d_buffer,gpu1,n_buffer*sizeof(int),stream_0);
+
+	}
+
+	void transfer_intra_standard(int n_buffer){
+
+		int gpu1 = 0;
+		int gpu2 = 1;
+		int *d_buffer;
+		int *d2_buffer;
+		int *buffer;
+
+		buffer = (int*) malloc(sizeof(int)*n_buffer);
+
+
+		cudaSetDevice(gpu1);
+		cudaMalloc(&d_buffer,sizeof(int)*n_buffer)
+		cudaMemcpy(buffer,d_buffer,n_buffer*sizeof(int),cudaMemcpyDeviceToHost);
+
+		cudaSetDevice(gpu2);
+		cudaMalloc(&d2_buffer,sizeof(int)*n_buffer);
+		cudaMemcpy(d2_buffer,buffer,n_buffer*sizeof(int),cudaMemcpyHostToDevice);
+
+	}
+
+	void getResult(int *d_buff, int *h_buff,int size){
+
+		cudaMemcpy(h_buff,d_buff,size*sizeof(int),cudaMemcpyDeviceToHost);
+
+	}
+
+	void clean(int **d_buff, int **d_rank){
+		cudaFree(*d_buff);
+		cudaFree(*d_rank);
+	}
+
+
+}

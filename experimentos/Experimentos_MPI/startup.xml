@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+
+	<modules>
+		<file name="arquivo1.cu"/>
+		<func funcName="funcao1"/>
+
+		<includes>
+			<inc>/usr/include</inc>
+		</includes>		
+		<libraries>
+			<libPath>/usr/lib</libPath>
+			<lib>m</lib>
+		</libraries>
+
+	</modules>
+
+	<modules>
+		<file name="arquivo2.cu"/>
+		<func funcName="funcao2"/>	
+
+		<includes>
+			<inc>/usr/include</inc>
+		</includes>		
+		<libraries>
+			<libPath>/usr/lib</libPath>
+			<lib>m</lib>
+		</libraries>
+
+	</modules>
+
+
+	<home>
+		<directory dir="/home/framework/"/>
+	</home>
+
+	<machine>
+		<ipmachine ip="172.16.67.17" ngpus="2"/>
+
+	</machine>
+
+
+</config>

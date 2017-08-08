@@ -1,0 +1,113 @@
+
+<html>
+<head>
+<meta http-equiv="Cache-Control" content="no-store" />
+</head>
+<body>
+<script>
+function createFile(channels, sampleRate, seconds, bitsPerSample, waveDataArray){
+
+	var dataSize = sampleRate * seconds * channels * bitsPerSample/8;
+	var buffer = new ArrayBuffer(dataSize + 44);
+	var dv = new DataView(buffer);
+	var p = 0;
+
+
+	function writeString(s) {
+	    for (var i = 0; i < s.length; i++) {
+		dv.setUint8(p + i, s.charCodeAt(i));
+	    }
+	    p += s.length;
+	}
+
+	function writeData(data, channels) {
+	    for (var i = 0; i < channels; i++) {
+		for (var j = 0; j < data[i].length; j++) {
+		    dv.setUint16(p, data[i][j] * 0x7FFF, true);
+		    p += 2;
+		}
+	    }
+	}
+
+	function writeUint32(d) {
+	    dv.setUint32(p, d, true);
+	    p += 4;
+	}
+
+	function writeUint16(d) {
+	    dv.setUint16(p, d, true);
+	    p += 2;
+	}
+
+	writeString('RIFF');              // ChunkID
+	writeUint32(dataSize + 36);       // ChunkSize
+	writeString('WAVE');              // Format
+	writeString('fmt ');              // Subchunk1ID
+	writeUint32(16);                  // Subchunk1Size
+	writeUint16(1);                   // AudioFormat
+	writeUint16(channels);            // NumChannels
+	writeUint32(sampleRate);          // SampleRate
+	writeUint32(sampleRate * channels * bitsPerSample/8); // ByteRate
+	writeUint16(channels * bitsPerSample/8); // BlockAlign
+	writeUint16(bitsPerSample);       // BitsPerSample
+	writeString('data');              // Subchunk2ID
+	writeUint32(dataSize);            // Subchunk2Size
+	writeData(waveDataArray, channels);
+
+	return dv;
+}
+
+function download(){
+	var channels = 1;
+	var sampleRate = 44100;
+	var bitsPerSample = 16;
+	var seconds = 2;
+	var frequency = 3000;
+	var name;
+
+	name = "White_Noise";
+
+	var data = [];
+	var waveDataArray = [];
+
+	for (var i = 0; i < sampleRate * seconds; i++) {    
+		data[i] = Math.random() * 2 - 1;
+	}
+	for (var c = 0; c < channels; c++){
+		waveDataArray[c] = data;
+	}
+
+	var dv = createFile(channels, sampleRate, seconds, bitsPerSample, waveDataArray);
+	var blob = new Blob ( [ dv ], { type : 'audio/wav' } );
+
+	console.log('Iniciando Download...');
+	var url = (window.URL || window.webkitURL).createObjectURL(blob);
+
+	var link = window.document.createElement('a');
+	link.href = url;
+	link.download = name+'.wav';
+	document.body.appendChild(link);
+	link.click();
+}
+
+</script>
+	<form action="#" method="get">
+            <center><div style="width: 60%; border-style: groove;">
+                <h3>Gerador de Ondas</h3>
+	<input type="button" id="butDown" style="
+                    height: 40px; 
+                    width: 100px; 
+                    color: white;
+                    text-align: center;
+                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+                    background: #1abc9c;
+                    border: 0;
+                    border-bottom: 2px solid #12ab8d;
+                    cursor: pointer;
+                    -webkit-box-shadow: inset 0 -2px #12ab8d;
+                    box-shadow: inset 0 -2px #12ab8d;" value="Download" onclick="download()" /></p>
+	</div></center>
+        </form> 
+</body>
+</html>
+

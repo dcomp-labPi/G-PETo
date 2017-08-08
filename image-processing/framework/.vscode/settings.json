@@ -1,0 +1,6 @@
+{
+	"files.associations": {
+		"*.h": "c",
+		"comm.cpp": "c"
+	}
+}

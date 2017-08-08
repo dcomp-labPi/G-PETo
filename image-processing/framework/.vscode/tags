@@ -1,0 +1,27 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+arquivo	../parse.py	/^arquivo = open("Makefile","w")$/;"	kind:variable	line:14
+config	../parse.py	/^config = open("comm\/config","w")$/;"	kind:variable	line:19
+cont	../parse.py	/^cont = 0$/;"	kind:variable	line:23
+cont_rank	../parse.py	/^		cont_rank = cont_rank + 1$/;"	kind:variable	line:30
+cont_rank	../parse.py	/^	cont_rank = 0$/;"	kind:variable	line:26
+cont_rank	../parse.py	/^cont_rank = 0$/;"	kind:variable	line:21
+cudacc	../parse.py	/^cudacc = "\/usr\/local\/cuda-8.0\/bin\/nvcc"$/;"	kind:variable	line:53
+functions_file	../parse.py	/^functions_file = open("functions_names","w")$/;"	kind:variable	line:16
+hosts	../parse.py	/^hosts = open("comm\/hosts.cfg","w")$/;"	kind:variable	line:18
+hosts_ips	../parse.py	/^hosts_ips = []$/;"	kind:variable	line:9
+mkcuda	../parse.py	/^mkcuda = "$(CUDACC)"$/;"	kind:variable	line:54
+names	../parse.py	/^	names = names +" "+ neighbor.get('name')$/;"	kind:variable	line:43
+names	../parse.py	/^names = ""$/;"	kind:variable	line:10
+names_files	../parse.py	/^names_files = []$/;"	kind:variable	line:7
+names_functions	../parse.py	/^names_functions = []$/;"	kind:variable	line:8
+objs	../parse.py	/^	objs = objs+i.strip(".cu")+".o"+" "$/;"	kind:variable	line:57
+objs	../parse.py	/^objs = ""$/;"	kind:variable	line:55
+parse.py	../parse.py	1;"	kind:file	line:1
+rank	../parse.py	/^		rank = rank + 1$/;"	kind:variable	line:31
+rank	../parse.py	/^rank = 0$/;"	kind:variable	line:20
+root	../parse.py	/^root = ET.parse('startup.xml').getroot()$/;"	kind:variable	line:12

@@ -1,0 +1,56 @@
+
+echo "Executando experimentos de transferência de dados entre GPUS"
+
+#echo "Executando para MPI_PADRAO"
+#for i in 209715200 235929600 262144000; do
+#	echo "Tamanho ${i} ints" >> tempos_MPI_padrão.txt
+#	echo "Tamanho ${i} ints"
+#	for j in `seq 1 30`;do
+#		start=`date +%s%N | cut -b1-13`
+#		/opt/openmpi/bin/mpirun -npernode 1 -hostfile hosts.cfg  ./direct 0 $i
+#		end=`date +%s%N | cut -b1-13`
+#		runtime=$((end-start))
+#		echo $runtime >> tempos_MPI_padrão.txt
+#	done;
+
+#done;
+#echo "Executando para MPI_P2P"
+#for i in 78643200 104857600 131072000 157286400 183500800 209715200 235929600 262144000; do
+#        echo "Tamanho ${i} ints" >> tempos_MPI_P2P.txt
+#        echo "Tamanho ${i} ints"
+#        for j in `seq 1 30`;do
+#                start=`date +%s%N | cut -b1-13`
+#                /opt/openmpi/bin/mpirun -npernode 1 -hostfile hosts.cfg  ./direct 1 $i
+#                end=`date +%s%N | cut -b1-13`
+#                runtime=$((end-start))
+#                echo $runtime >> tempos_MPI_P2P.txt
+#        done;
+
+#done;
+echo "Executando para INTRA_PADRAO"
+for i in 26214400 52428800 78643200 104857600 131072000 157286400 183500800 209715200 235929600 262144000; do
+        echo "Tamanho ${i} ints" >> tempos_intra_padrao.txt
+        echo "Tamanho ${i} ints"
+        for j in `seq 1 30`;do
+                start=`date +%s%N | cut -b1-13`
+                /opt/openmpi/bin/mpirun -npernode 1 -hostfile hosts.cfg  ./direct 2 $i
+                end=`date +%s%N | cut -b1-13`
+                runtime=$((end-start))
+                echo $runtime >> tempos_intra_padrao.txt
+        done;
+
+done;
+
+echo "Executando para INTRA_P2P"
+for i in 26214400 52428800 78643200 104857600 131072000 157286400 183500800 209715200 235929600 262144000; do
+        echo "Tamanho ${i} ints" >> tempos_intra_P2P.txt
+        echo "Tamanho ${i} ints"
+        for j in `seq 1 30`;do
+                start=`date +%s%N | cut -b1-13`
+                /opt/openmpi/bin/mpirun -npernode 1 -hostfile hosts.cfg  ./direct 3 $i
+                end=`date +%s%N | cut -b1-13`
+                runtime=$((end-start))
+                echo $runtime >> tempos_intra_P2P.txt
+        done;
+
+done;

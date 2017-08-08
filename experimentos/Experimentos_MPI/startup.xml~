@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+
+	<modules>
+		<file name="filtro_1.c"/>
+		<func funcName="calcula_algo"/>
+
+		<includes>
+			<inc>/usr/include</inc>
+		</includes>		
+		<libraries>
+			<libPath>/usr/lib</libPath>
+			<lib>m</lib>
+		</libraries>
+
+	</modules>
+
+	<modules>
+		<file name="arquivo2.cu"/>
+		<func funcName="funcao2"/>	
+
+		<includes>
+			<inc>/usr/include</inc>
+		</includes>		
+		<libraries>
+			<libPath>/usr/lib</libPath>
+			<lib>m</lib>
+		</libraries>
+
+	</modules>
+
+
+	<modules>
+		<file name="arquivo3.cu"/>
+		<func funcName="funcao3"/>	
+
+		<includes>
+			<inc>/usr/include</inc>
+		</includes>		
+		<libraries>
+			<libPath>/usr/lib</libPath>
+			<lib>xml2</lib>
+			<lib>m</lib>
+		</libraries>
+
+	</modules>
+
+
+	<home>
+		<directory dir="/home/framework/"/>
+	</home>
+
+	<machine>
+		<ipmachine ip="192.168.0.2" ngpus="1"/>
+
+	</machine>
+
+	<machine>
+		<ipmachine ip="192.168.0.3" ngpus="2"/>
+
+	</machine>
+
+
+</config>

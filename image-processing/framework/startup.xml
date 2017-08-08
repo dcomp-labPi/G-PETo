@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+	<modules>
+		<file name="funcao.cu"/>
+		<func funcName="funcaoEnv1"/>
+		<func funcName="funcaoProc1"/>
+		<func funcName="funcaoProc2"/>
+		<func funcName="funcaoProc3"/>
+
+		<includes>
+			<inc>/usr/include</inc>
+		</includes>		
+		<libraries>
+			<libPath>/usr/lib</libPath>
+			<lib>m</lib>
+		</libraries>
+	</modules>
+
+	<home>
+		<directory dir="/home/labpi/Dropbox/renan/wscad2017/Millas/framework-internode"/>
+	</home>
+
+	<machine>
+		<ipmachine ip="172.16.67.17" ngpus="3"/>
+	</machine>
+
+	<machine>
+		<ipmachine ip="172.16.67.2" ngpus="1"/>
+	</machine>
+</config>

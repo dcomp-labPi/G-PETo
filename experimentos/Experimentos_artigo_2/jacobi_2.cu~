@@ -1,0 +1,265 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+#include <pthread.h>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+
+
+#define N_THREADS 2
+
+typedef struct {
+	int grau;
+	int init;
+	int end;
+	float *matriz;
+	float **resultados;
+	float *constantes;
+	int id;
+} thread_arg_t;
+
+
+__global__ void kernel_jacobi(float *d_matriz,float *d_constantes, float *d_resultados, int *d_grau){
+	int ix = blockIdx.x*blockDim.x + threadIdx.x;
+	float c;
+	int i;
+	c = d_constantes[ix];
+	for(i=0;i<(*d_grau);i++) {
+		
+		if(ix!=i) {
+			c = c - d_matriz[ix*(*d_grau)+i]*d_resultados[i];
+		}
+
+		
+	}
+
+	for(i=0;i<*d_grau;i++) {
+		d_resultados[ix]=c/d_matriz[i*(*d_grau)+i];
+	}
+	
+	//__syncthreads();
+}
+
+
+void *jacobi_parallel(void *_arg){
+
+	thread_arg_t *arg = (thread_arg_t*)_arg;
+
+	int grau = arg->grau;
+	int init = arg->init;
+	int end = arg->end;
+	float *matriz = arg->matriz;
+	float **resultados = arg->resultados;
+	float *constantes = arg->constantes;
+
+
+	float c;
+	int i,ix;
+
+	for(i=0;i<grau;i++){
+		(*resultados)[i] = 0;
+	}
+	
+
+	for(ix = init;ix<end;ix++){
+		c = constantes[ix];
+		for(i=0;i<(grau);i++) {
+		
+			if(ix!=i) {
+				c = c - matriz[ix*grau+i]*(*resultados)[i];
+			}
+
+		
+		}
+
+		for(i=0;i<grau;i++) {
+			(*resultados)[ix]=c/matriz[i*grau+i];
+		}
+	}
+
+}
+
+
+void jacobi_gpu(float *matriz,float *constantes,int iteracoes,int grau,float **resultados){
+
+	float *d_matriz;
+	float *d_constantes;
+	float *d_resultados;
+	int *d_grau;
+	int m,i;
+	clock_t begin, end;
+	double time_spent;
+
+
+	dim3 grid, block;
+	block.x = 1024;
+	grid.x = (grau + block.x - 1) / block.x;
+
+	for(i=0;i<grau;i++){
+		(*resultados)[i] = 0;
+	}
+
+	cudaMalloc(&d_matriz,sizeof(float)*grau*grau);
+	cudaMalloc(&d_constantes,sizeof(float)*grau);
+	cudaMalloc(&d_resultados,sizeof(float)*grau);
+	cudaMalloc((void**)&d_grau,sizeof(int));
+
+	cudaMemcpy(d_matriz,matriz,sizeof(float)*grau*grau,cudaMemcpyHostToDevice);
+	cudaMemcpy(d_constantes,constantes,sizeof(float)*grau,cudaMemcpyHostToDevice);
+	cudaMemcpy(d_resultados,*resultados,sizeof(float)*grau,cudaMemcpyHostToDevice);
+	cudaMemcpy(d_grau,&grau,sizeof(int),cudaMemcpyHostToDevice);
+
+	double inicio, final; // variáveis para armazenar tempo real
+	struct timeval tv;  // armazena tempo do usuário e tempo do sistema
+	gettimeofday(&tv,NULL); // inicio do marcador de tempo real
+	inicio= tv.tv_sec + (tv.tv_usec/1000000.0); 
+	
+	for(m=0;m<iteracoes;m++){
+		kernel_jacobi<<<grid,block>>>(d_matriz,d_constantes,d_resultados,d_grau);
+	}
+
+
+	end = clock();
+
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+
+	cudaMemcpy(*resultados,d_resultados,sizeof(float)*grau,cudaMemcpyDeviceToHost);
+	cudaMemcpy(&grau,d_grau,sizeof(int),cudaMemcpyHostToDevice);
+
+	
+	printf("Tempo: %f\n",time_spent);
+
+	//printf("Grau da GPU: %d\n",grau);
+
+	cudaFree(d_matriz);
+	cudaFree(d_constantes);
+	cudaFree(d_resultados);
+	cudaFree(d_grau);
+
+
+}
+
+
+void jacobi(float *matriz,float *constantes,int iteracoes,int grau, float **resultados){
+
+	//float *resultados;
+	int i,j,m;
+	float *c;
+	clock_t begin, end;
+	double time_spent;
+
+	c = (float*) malloc(sizeof(float)*grau);
+	begin = clock();
+
+	for(i=0;i<grau;i++){
+		(*resultados)[i] = 0;
+	}
+
+	for(m=0;m<iteracoes;m++){
+	
+		for(i=0;i<grau;i++) {
+			c[i] = constantes[i];
+			for(j=0;j<grau;j++) {
+				if(i!=j) {
+					c[i]=c[i]-matriz[i*grau+j]*(*resultados)[j];
+				}
+			}
+		}
+
+		for(i=0;i<grau;i++) {
+			(*resultados)[i]=c[i]/matriz[i*grau+i];
+		}
+
+
+	}
+	end = clock();
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Tempo: %f\n",time_spent);
+
+}
+
+
+
+int main(int argc, char* argv[]){
+
+
+	float *constantes;
+	float *resultados;
+	float *matriz;
+	int iteracoes = 10;
+	int grau;
+	FILE *arquivo;
+
+
+	pthread_t thread[N_THREADS];
+	thread_arg_t args[N_THREADS];
+
+
+	int i,j;
+
+	int isGPU = 0;
+
+	isGPU = atoi(argv[2]);
+
+	arquivo = fopen(argv[1],"r+");
+
+	fscanf(arquivo,"%d\n",&grau);
+
+
+	//Alocação em memória
+
+	constantes = (float*) malloc(sizeof(float)*grau);
+	resultados = (float*) malloc(sizeof(float)*grau);
+	matriz = (float*) malloc(sizeof(float)*grau*grau);
+	
+
+	//Leitura da entrada
+
+	for(i=0;i<grau;i++){
+		for(j=0;j<grau;j++){
+			fscanf(arquivo,"%f\t",&(matriz[i*grau+j]));
+		}
+		fscanf(arquivo,"%f\n",&(constantes[i]));
+	}
+	if(isGPU == 2){
+		jacobi_gpu(matriz,constantes,iteracoes,grau,&resultados);
+	}else if(isGPU == 1){
+		jacobi(matriz,constantes,iteracoes,grau,&resultados);
+	}else{
+		clock_t begin, end;
+		double time_spent;
+		begin = clock();
+		for(i=0;i<iteracoes;i++){
+			for(j=0;j<N_THREADS;j++){
+				args[j].grau = grau;
+				args[j].init = (j*grau)/N_THREADS;
+				args[j].end = ((j+1)*grau)/N_THREADS;
+				args[j].matriz = matriz;
+				args[j].constantes = constantes;
+				args[j].resultados = &resultados;
+				pthread_create(&(thread[j]), NULL, jacobi_parallel, &(args[j]));
+			}
+			for(j=0;j<N_THREADS;j++){
+				pthread_join(thread[j],NULL);
+			}
+		}
+		end = clock();
+		time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+		printf("Tempo: %f\n",time_spent);
+		
+	}
+	/*
+	for(i=0;i<grau;i++){
+		printf("X(%d): %f\n",i,resultados[i]);
+	}*/
+
+
+
+	
+
+	return 0;
+
+
+
+}

@@ -1,0 +1,37 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/include/c++/6.2.0",
+                "/usr/include/x86_64-linux-gnu/c++/6.2.0",
+                "/usr/local/include",
+                "/usr/lib/clang/3.9.0/include",
+                "/usr/include",
+                "/usr/include/mpich/",
+                "/usr/include/libpng/",
+                "/usr/include/x86_64-linux-gnu",
+                "${workspaceRoot}",
+                "${workspaceRoot}/comm"
+            ],
+            "defines": [],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "/usr/include/c++/6.2.0",
+                    "/usr/include/x86_64-linux-gnu/c++/6.2.0",
+                    "/usr/local/include",
+                    "/usr/lib/clang/3.9.0/include",
+                    "/usr/include",
+                    "/usr/include/mpich/",
+                    "/usr/include/x86_64-linux-gnu",
+                    "${workspaceRoot}",
+                    "${workspaceRoot}/comm"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 2
+}
